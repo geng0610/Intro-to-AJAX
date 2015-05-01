@@ -43,10 +43,31 @@ function loadData() {
                 var article = articles[i];
                 //console.log(article.web_url);
                 tempNytArticles.append('<li class = "article">'+'<a href ="'+article.web_url+'">'+article.headline.main+'</a>'+'<p>'+article.snippet+'</p>'+'</li>');
-            }
+            };
             $nytElem.append(tempNytArticles);
+        }).error(function(e){
+            $nytHeaderElem.text('New York Times Articles Could not be Loaded');
+        });
+        var wikiURL = 'http://en.wikipedia.org/w/api.php?action=opensearch&search='+cityStr+'&format=json&callback=wikiCallback';
+        
+        var wikiRequestTimeout = setTimeout(function(){
+            $wikiElem.text("failed to get wikipedia resources");
+        }, 8000);
 
+        $.ajax({
+            url:wikiURL,
+            dataType:"jsonp",
+            success: function(response){
+                var articleList=response[1];
+                for (var i=0; i<articleList.length; i++){
+                    articleStr = articleList[i];
+                    var url = 'http:en.wikipedia.org/wiki/'+articleStr;
+                    console.log(url);
+                    $wikiElem.append('<li><a href="'+url+'">'+articleStr+'</a></li>');
+                };
 
+                clearTimeout(wikiRequestTimeout);
+            }
         });
     }
 
